@@ -10,9 +10,9 @@ def read_image():
     for j, dir in enumerate(dirs):
         for i in range(1, 51):
             image = cv2.imread('./face/%s/%d.jpg' % (dir, i))
-            gray = cv2.cvtColor(image, code=cv2.COLOR_GRB2GRAY)
-            gray = cv2.resize(gray, (64, 64))
-            x.append(gray)
+#            gray = cv2.cvtColor(image, code=cv2.COLOR_RGB2GRAY)
+#            image = cv2.resize(image, (64, 64))
+            x.append(image)
             y.append(j)
     return [x, y, dirs]
 
@@ -35,7 +35,7 @@ if __name__ == '__main__':
     video = cv2.VideoCapture(0)
     face_detector = cv2.CascadeClassifier('./haarcascade_frontalface_alt.xml')
     while True:
-        frame = cv2.imread("1.jpg")
+        frame = video.read()
         gray = cv2.cvtColor(frame, code=cv2.COLOR_RGB2GRAY)
         faces = face_detector.detectMultiScale(gray)
         for x, y, w, h in faces:

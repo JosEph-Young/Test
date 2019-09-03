@@ -7,11 +7,12 @@ def read_image():
     dirs = os.listdir('./face')
     x = []
     y = []
-    print(dirs)
     for j, dir in enumerate(dirs):
-        for i in range(1, 51):
+        if dir == '.DS_Store':
+            continue
+        for i in range(1, 201):
             image = cv2.imread('./face/%s/%d.jpg' % (dir, i))
-#            gray = cv2.cvtColor(image, code=cv2.COLOR_RGB2GRAY)
+            #            gray = cv2.cvtColor(image, code=cv2.COLOR_RGB2GRAY)
             image = cv2.resize(image, (64, 64))
             x.append(image)
             y.append(j)
@@ -20,32 +21,37 @@ def read_image():
 
 if __name__ == '__main__':
     x, y, dirs = read_image()
+    font = cv2.FONT_HERSHEY_COMPLEX
     x = np.asarray(x)
     y = np.asarray(y)
-    index = [i for i in range(100)]
+    index = [i for i in range(400)]
     np.random.shuffle(index)
     x = x[index]
     y = y[index]
-    x_train = x[:70]
-    y_train = y[:70]
-    x_test = x[70:]
-    y_test = y[70:]
+    x_train = x[:300]
+    y_train = y[:300]
+    x_test = x[300:]
+    y_test = y[300:]
     model = cv2.face.EigenFaceRecognizer_create()
     print(model)
     model.train(x_train, y_train)
     video = cv2.VideoCapture(0)
     face_detector = cv2.CascadeClassifier('./haarcascade_frontalface_alt.xml')
     while True:
-        flag,frame = video.read()
+        flag, frame = video.read()
         gray = cv2.cvtColor(frame, code=cv2.COLOR_RGB2GRAY)
         faces = face_detector.detectMultiScale(gray)
         for x, y, w, h in faces:
             face = gray[y:y + h, x:x + w]
             face = cv2.resize(face, (64, 64))
             result = model.predict(face)
+            img_char = cv2.putText(gray, '%s' % dirs[result[0]], (x + w, y + h), font, 1.2, (0, 0, 255), 2)
+            #            cv2.rectangle(face, pt1=(x, y), pt2=(x + w, y + h), color=[0, 0, 255], thickness=2)
             print('该人脸是：', dirs[result[0]])
             pass
-        cv2.imshow('face', frame)
+        cv2.imshow("Test", img_char)
         cv2.waitKey(0)
+        #        cv2.imshow('face', frame)
+        #        cv2.waitKey(0)
         pass
     video.release()
